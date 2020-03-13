@@ -1,0 +1,17 @@
+%% Load data as table
+load('allFiles_Table.mat')
+tf1 = allFiles_Table.Magnification == 100;
+% Create first source domain datastore based on subset of images defined by tf1;
+% Labels assigned based on variant
+source1_ds = imageDatastore(allFiles_Table.FileName(tf1),"Labels",categorical(allFiles_Table.Variant(tf1),'Ordinal',0));
+% change the customized image read function to a specific pre-processing
+% function, which pre-crops the images based on Fast Marching algorithm
+source1_ds.ReadFcn = @segmentAndCropImage_DS;
+% Create second source domain dataset based on categorical cutting lengths
+% with ordinal definitions ignored
+clabels_s2 = categorical(allFiles_Table.CuttingDistance(tf1),'Ordinal',0);
+% Same datastore, different categorical labels
+source2_ds = source1_ds;
+source2_ds.Labels = clabels_s2;
+% Same datastore, discrete label categories
+[cedges,clabels] = discretize(allFiles_Table.CuttingDistance(tf1),8,'categorical',

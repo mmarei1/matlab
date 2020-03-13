@@ -1,0 +1,18 @@
+% Pre-training the network layers on datastore of all images to improve
+% feature transferability
+
+%% Step 1: Use pre-trained models to learn features relevant to existing dataset by learning to classify healthy and worn tools
+% from all provided images
+% This step adapts the network to fine-tune the weights of the networks so
+% that they learn relevant features to the specified problem
+% Use the softmax as the loss metric for this binary classification
+% problem
+wd = "/home/mareim/Downloads/cutting_tool_images"
+ctds_AllFiles = imageDatastore(wd,"IncludeSubfolders",1);
+allFiles = ctds_AllFiles.Files;
+for i = 1:length(allFiles)
+    % function to parse string filename into ExpLabel, DistLabel, and
+    % WearState
+    [Experiment,CuttingDistance,Magnification,Variant] = parseLabelsFromFileNames(allFiles{i},wd)
+end
+%% Step 2: Having adapted the weights relevant to the health state prediction problem, 

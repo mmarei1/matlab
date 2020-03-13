@@ -1,0 +1,13 @@
+    figure(2); clf reset;
+    plot(1:numel(yval),yval,'bo');
+    hold on;
+    plot(1:numel(yval),ypred_re2_n,'ro');
+    plot(1:numel(yval),YPred{1},'ko');
+    hold off;
+    legend("Targets","Predictions (FE)",'Predictions (FT)')
+    ylabel("Normalised Tool Wear Value (mm)")
+    xlabel("Record Number")
+    title(sprintf("Regression output of finetuning vs feature extraction methods for %s - RMSE = %3f",expNames{i},rmse_ens2_n))
+    predictions_plotname = expNames{i}+"_comparison_"+".png";
+    predictions_filename = expNames{i}+"_predictions.mat";
+    saveas(gcf,predictions_plotname);

@@ -1,0 +1,17 @@
+% script to output a new table sorted by experiment number and the length
+% of wear
+startIndex = 1;
+endIndex = 0;
+for i = 1:unique(localTable.exp)
+    % set the current experiment to i
+    currentExp = i;
+    % take all the sub-experiments under i to be the new experiments
+    expObservations = find(localTable(:,'exp'==currentExp);
+    numRows = size(expObservations,1);
+    subTable = localTable(:,expObservations);
+    oldIDs = localTable.id(expObservations);
+    newSubtable = sort(subTable,'xlabel');
+    endIndex = startIndex:startIndex+numRows-1;
+    sortedLocalTable(startIndex:endIndex) = newSubtable;
+    startIndex = endIndex+1;
+end

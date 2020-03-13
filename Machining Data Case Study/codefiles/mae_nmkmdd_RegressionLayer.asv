@@ -1,0 +1,100 @@
+classdef mae_nmkmdd_RegressionLayer < nnet.layer.RegressionLayer
+    % custom regression layer with mean-absolute-error loss and a pre-assumed mmd value.
+    properties
+        Weights
+        LossFunction
+        LayerGraph
+        HiddenLayers
+        SourceData;
+        TargetData;
+    end
+    
+    methods
+        function layer = mae_nmkmdd_RegressionLayer(name, lossType, netArray, sourceData, targetData,hiddenLayers, weights)
+            % layer = mae_nmkmmd_RegressionLayer(name) creates a
+            % mean-absolute-error + normalized MKMMD regression layer  and specifies the layer
+            % name.
+			
+            % Set layer name.
+            layer.Name = name;
+            layer.LayerGraph = netArray;
+            % Set layer description.
+            if strcmp(lossType,"mse-mmd")
+                layer.Description = 'Mean Squared Error with MK-MMD loss';
+                layer.Weights = weights;            
+                layer.FeatureOutputs = netArray(hiddenLayers).Name;
+                layer.SourceData = sourceData;
+                layer.TargetData = targetData;
+            else
+                layer.Description  = "Mean Squared Error";
+                layer.Weights = [1, 0];
+                layer.FeatureOutputs = {};
+                layer.SourceData = {};
+                layer.TargetData = {};
+            end
+        end
+        
+%         function Z = predict(layer, varargin)
+%             % run the prediction function on the inputs
+%             X = varargin;
+%             wmse = layer.Weights(1);
+%             wnmmd = layer.Weights(2);
+%             mmd = layer.NMMD;
+%             X1 = X(1);
+%             sz = size(X1);
+%             Z = zeros(sz,'like',X1);
+%             
+%             for i = 1:layer.NumInputs
+%                 Z = Z + wmse.*X1 + wnmmd.*mmd ;
+%             end
+%             
+%         end
+        
+        function loss = forwardLoss(layer, Y, T, sourceData, targetData)
+            % loss = forwardLoss(layer, Y, T) returns the MSE loss between
+            % the predictions Y and the training targets T.
+            wmse = layer.Weights(1);
+            wnmmd = layer.Weights(2);
+            R = size(Y,3);
+            N = size(Y,4);
+            
+            % Calculate MAE over number of outputs.
+            meanSquaredError = sum(((Y-T).^2),3)/R;
+            
+            % Output MMD: compute the value of MMD and normalize
+            % Take mean over mini-batch.
+            % ONLY compute MMD weights if wmmd > 0
+            if wnmmd > 0
+                sourceData = sourceData(:,:,:,N);
+                targetData = targetData(:,:,:,N);
+                [mmd,gradMMD] = mmdLoss(sourceData,targetData,layer.LayerGraph,layer.FeatureOutputs);
+            else
+                mmd = 0;
+            end
+            loss = wmse .* sum(meanSquaredError)/N + wnmmd .* mmd;
+        end
+%       
+%       Compute Backward Loss of MSE-MMD
+        function [dLdMSE,dldMMD] = backwardLoss(layer, Y, T, sourceData, targetData)
+        
+            % Prepare weights
+            wmse = layer.Weights(1);
+            wnmmd = layer.Weights(2);
+            R = size(Y,3);
+            N = size(Y,4);
+            % compute the MSE inverse gradient by multiplying it by double
+            % the MSE and the MSE weight
+            dLdMSE = 2*wmse*N*(Y-T);
+            if wnmmd > 0
+                sourceData = sourceData(:,:,:,N);
+                targetData = targetData(:,:,:,N);
+            [~,gradMMD] = mmdLoss(sourceData,targetData,layer.LayerGraph,layer.FeatureOutputs);
+            %gradMMD = gradMMD*wnmmd;
+            else
+                gradMMD = 0;
+            end
+            % weight the MMD loss by its weight during back-prop
+            dLdMMD = wnmmd*gradMMD;
+        end
+    end
+end

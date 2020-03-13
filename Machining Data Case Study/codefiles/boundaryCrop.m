@@ -1,0 +1,37 @@
+function [croppedImage] = boundaryCrop(Im)
+    % implement sobel edge detection with a threshold of 0.015
+    I = imread(Im);
+    edgeMask = edge(rgb2gray(I),'sobel',0.015);
+    
+    % mask the image with the edge mask
+    imageMask = bwareafilt(edgeMask,1);
+    
+    % measure the bounding box surrounding the foreground, i.e. the region
+    % of interest
+    labeledImage = bwlabel(imageMask);
+    measurements = regionprops(labeledImage,'BoundingBox');
+    % pad the bounding box slightly to reduce the likelihood of cropping
+    % out too much of the image
+%     hShift = -40;
+%     vShift = 140;
+%     hPad = 0;
+%     vPad = -160;
+    
+    bbA = measurements.BoundingBox;
+    hStart = bbA(1);
+    vStart = bbA(2);
+    hHeight = 750;
+    hWidth = 750;
+    
+%     if bbA(2) >= 300
+%         vShift = 0;
+%         hShift = 0;
+%         vPad = 0;
+%         hPad = 0;
+%     end
+    
+    bbN = [hStart-50, vStart-50, hWidth, hHeight];
+    
+    croppedImage = imcrop(I,bbN);
+end
+

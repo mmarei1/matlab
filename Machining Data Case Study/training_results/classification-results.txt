@@ -1,0 +1,2 @@
+id NetworkName NetworkSize_1 NetworkSize_2 dateAndTime Accuracy TrainingTime
+1 alexnet 1 1 "29-Nov-2018 16:55:32" 0.833333333333333 650.374270041436
