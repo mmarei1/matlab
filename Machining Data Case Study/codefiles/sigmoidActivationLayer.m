@@ -1,7 +1,14 @@
  classdef sigmoidActivationLayer < nnet.layer.Layer
-    % define a sigmoidal activation layer with two input parameters:
-    % the number of channels and the name of the layer.
-    
+    %% layer = sigmoidActivationLayer(channels,name)
+    %
+    % Define a sigmoidal activation layer with two input parameters:
+    % channels: the number of channels
+    % name: the name of the layer.
+    % The backward function of this layer is computed via auto
+    % differentiation.
+    %
+    % Created by Mohamed Marei, 2020
+    %%
 properties (Learnable)
         % learnable Parameters
          %Alpha
