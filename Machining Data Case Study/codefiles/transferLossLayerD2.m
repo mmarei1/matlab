@@ -125,7 +125,6 @@ classdef transferLossLayerD2 < nnet.layer.RegressionLayer
                 sourceFeatures = extractDLarrayFeatures(dlnet,hiddenLayers,sourceData,N);
                 targetFeatures = extractDLarrayFeatures(dlnet,hiddenLayers,targetData,N);
                 [~,gradMMD] = mmdLossD2(sourceFeatures,targetFeatures,N,dlnet,hiddenLayers);
-            %gradMMD = gradMMD*wnmmd;
             else
                 gradMMD = 0;
             end
