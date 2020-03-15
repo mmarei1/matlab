@@ -91,6 +91,9 @@ classdef transferLossLayer < nnet.layer.RegressionLayer
             if wnmmd > 0
                 sourceData = layer.SourceData(1:N,1);
                 targetData = layer.TargetData(1:N,1);
+                
+                dlnet = dlnetwork(layer.LayerGraph);
+                
                 [mmd,~] = mmdLoss(sourceData,targetData,N,layer.LayerGraph,layer.FeatureOutputs);
             else
                 mmd = 0;
