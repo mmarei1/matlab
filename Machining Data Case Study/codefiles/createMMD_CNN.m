@@ -1,9 +1,9 @@
 function finalLayers = createMMD_CNN(layers_in,lossType,mmd_weights,sourceData,targetData)
     % step 1: remove output layers
     if isa(layers_in,'SeriesNetwork')
-        lgraph = layerGraph(layers_in)
+        lgraph = layerGraph(layers_in.Layers)
     else
-        lgraph = layerGraph(layers_in.Layers);
+        lgraph = layerGraph(layers_in);
     end
     [~,sml,ol] = findBottomLayersToReplace(lgraph);
     layersToRemove = {sml.Name,ol.Name};
@@ -40,6 +40,9 @@ function finalLayers = createMMD_CNN(layers_in,lossType,mmd_weights,sourceData,t
     if strcmp(lossType,"mse-mmd")
         fprintf("CNN Training loss: %s loss \n",lossType)
         layerOut = transferLossLayer("mse_mmd_Reg","mse-mmd",...
+            lgraph,sourceData,targetData,hiddenLayers,mmd_weights)    
+    elseif strcmp(lossType,"mse-mmd2")
+        layerOut = transferLossLayerD2("mse_mmd_Reg","mse-mmd",...
             lgraph,sourceData,targetData,hiddenLayers,mmd_weights)    
     else
         fprintf("CNN Training loss: MSE loss \n")
