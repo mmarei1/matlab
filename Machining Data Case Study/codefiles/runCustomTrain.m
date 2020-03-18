@@ -2,9 +2,9 @@
 function [trainedNet, outputs] = runCustomTrain(dlnet, options, XTrain_tgt, YTrain_tgt, XTrain_src, YTrain_src)
 
 % set default training options 
-if isempty(options)
-    options = loadDefaultTrainingOptions("ft",'none');
-end
+% if isempty(options)
+%     options = loadDefaultTrainingOptions("ft",'none');
+% end
 
 % prepare plotting function
 plots = "training-progress";
